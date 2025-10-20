@@ -1,35 +1,38 @@
-#pragma once
+#pragma once // PlayerGUI.h
 #include <JuceHeader.h>
-#include "PlayerAudio.h" 
+#include "PlayerAudio.h"
 
 class PlayerGUI : public juce::Component,
-    public juce::Button::Listener,
-    public juce::Slider::Listener
+	public juce::Button::Listener,
+	public juce::Slider::Listener
 {
 public:
-    PlayerGUI();
-    ~PlayerGUI() override;
 
-    void resized() override;
+	PlayerGUI();
+	~PlayerGUI() override;
 
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
-    void releaseResources();
+	void resized() override;
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+	void releaseResources();
+	void setAudioPlayer(PlayerAudio* audio) { playerAudio = audio; }
 
 private:
-    PlayerAudio playerAudio;
 
-    // GUI elements 
-    juce::TextButton loadButton{ "Load File" };
-    juce::TextButton restartButton{ "Restart" };
-    juce::TextButton stopButton{ "Stop" };
-    juce::Slider volumeSlider;
+	PlayerAudio* playerAudio = nullptr;
+	// GUI elements
+	juce::TextButton loadButton{ "Load File" };
+	juce::TextButton PlayButton{ "Play" };
+	juce::TextButton RestartButton{ "Restart" };
+	juce::TextButton stopButton{ "Stop" };
+	juce::Slider volumeSlider;
 
-    std::unique_ptr<juce::FileChooser> fileChooser;
+	std::unique_ptr<juce::FileChooser> fileChooser;
 
-    // Event handlers 
-    void buttonClicked(juce::Button* button) override;
-    void sliderValueChanged(juce::Slider* slider) override;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
+	void buttonClicked(juce::Button* button) override;
+	void sliderValueChanged(juce::Slider* slider) override;
+	
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };

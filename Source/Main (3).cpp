@@ -26,12 +26,12 @@ private:
     public:
         MainWindow(juce::String name)
             : DocumentWindow(name,
-                juce::Colours::lightgrey,
+                juce::Colours::darkslategrey,
                 DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar(true);
-            setContentOwned(new MainComponent(), true); // MainComponent = our UI + logic
-            centreWithSize(400, 200);
+            setContentOwned(new MainComponent(), true); 
+            centreWithSize(600, 400);
             setVisible(true);
         }
 
@@ -45,4 +45,4 @@ private:
 };
 
 // This macro starts the app
-START_JUCE_APPLICATION(SimpleAudioPlayer);
+START_JUCE_APPLICATION(SimpleAudioPlayer)
