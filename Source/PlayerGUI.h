@@ -1,38 +1,41 @@
-#pragma once // PlayerGUI.h
+#pragma once
 #include <JuceHeader.h>
-#include "PlayerAudio.h"
+#include "PlayerAudio.h" 
 
 class PlayerGUI : public juce::Component,
-	public juce::Button::Listener,
-	public juce::Slider::Listener
+    public juce::Button::Listener,
+    public juce::Slider::Listener
 {
 public:
+    PlayerGUI();
+    ~PlayerGUI() override;
 
-	PlayerGUI();
-	~PlayerGUI() override;
+    void resized() override;
 
-	void resized() override;
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
-	void releaseResources();
-	void setAudioPlayer(PlayerAudio* audio) { playerAudio = audio; }
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+    void releaseResources();
 
 private:
+    PlayerAudio playerAudio;
 
-	PlayerAudio* playerAudio = nullptr;
-	// GUI elements
-	juce::TextButton loadButton{ "Load File" };
-	juce::TextButton PlayButton{ "Play" };
-	juce::TextButton RestartButton{ "Restart" };
-	juce::TextButton stopButton{ "Stop" };
-	juce::Slider volumeSlider;
+    // GUI elements 
+    juce::TextButton loadButton{ "Load File" };
+    juce::TextButton restartButton{ "Restart" };
+    juce::TextButton stopButton{ "Stop" };
+    juce::TextButton playPause{ "Pause/Play" };
+    juce::TextButton goToStart{ "Go to Start" };
+    juce::TextButton goToEnd{ "End" };
+    juce::TextButton muteButton{ "mute" };    // playerGui.h
+    
 
-	std::unique_ptr<juce::FileChooser> fileChooser;
+    juce::Slider volumeSlider;
 
+    std::unique_ptr<juce::FileChooser> fileChooser;
 
-	void buttonClicked(juce::Button* button) override;
-	void sliderValueChanged(juce::Slider* slider) override;
-	
+    // Event handlers 
+    void buttonClicked(juce::Button* button) override;
+    void sliderValueChanged(juce::Slider* slider) override;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
