@@ -119,14 +119,35 @@ void PlayerAudio::mute(float currentVolume)
 {
     if (!ismuteing)
     {
-        lastVolume = currentVolume;     
-        transportSource.setGain(0.0f);  
+        lastVolume = currentVolume;
+        transportSource.setGain(0.0f);
         ismuteing = true;
     }
     else
     {
-        transportSource.setGain(lastVolume);  
+        transportSource.setGain(lastVolume);
         ismuteing = false;
     }
 }
+void PlayerAudio::back10s() {
+    double newposition = getPosition() - 10.0;
 
+    if (newposition < 0.0)
+    {
+        newposition = 0.0;
+    }
+
+    transportSource.setPosition(newposition);
+}
+void PlayerAudio::forward10s()
+{
+    double newposition = getPosition() + 10.0;
+    double length = getLength();
+
+    if (newposition > length)
+    {
+        newposition = length;
+    }
+
+    transportSource.setPosition(newposition);
+}

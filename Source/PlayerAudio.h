@@ -24,7 +24,11 @@ public:
 	void goToStart();
 	void goToEnd();
 	void mute(float currentVolume);
-	
+	void forward10s();
+	void back10s();
+
+	juce::AudioTransportSource& getTransportSource() { return transportSource; }
+
 
 
 private:
