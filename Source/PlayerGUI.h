@@ -32,10 +32,10 @@ private:
     juce::TextButton back10Button{ "-10.0s" };
     juce::TextButton forward10Button{ "+10.0s" };
     juce::Slider volumeSlider;
-
-
     juce::Slider positionSlider;
     juce::Label timeLabel;
+    juce::Slider speedSlider;
+    juce::Label speedLabel;
     bool isDragging = false;
 
     std::unique_ptr<juce::FileChooser> fileChooser;

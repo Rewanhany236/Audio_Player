@@ -13,11 +13,23 @@ PlayerGUI::PlayerGUI()
     volumeSlider.setRange(0.0, 1.0, 0.1);
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
-
     addAndMakeVisible(volumeSlider);
+
+    // position slider
     positionSlider.setRange(0.0, 0.0, 0.01);
     positionSlider.addListener(this);
     addAndMakeVisible(positionSlider);
+
+    // Speed Slider 
+    speedSlider.setRange(0.5, 2.0, 0.1);
+    speedSlider.setValue(1.0);
+    speedSlider.addListener(this);
+    addAndMakeVisible(speedSlider);
+
+    // speed label
+    speedLabel.setText("Speed: 1.0x", juce::dontSendNotification);
+    speedLabel.setJustificationType(juce::Justification::centredLeft);
+    addAndMakeVisible(speedLabel);
 
     // Time label
     timeLabel.setText("00:00:00 / 00:00:00", juce::dontSendNotification);
@@ -64,8 +76,9 @@ void PlayerGUI::resized()
 
     volumeSlider.setBounds(10, 60, getWidth() - 20, 30);
     positionSlider.setBounds(10, 100, getWidth() - 20, 20);
-
     timeLabel.setBounds(10, 130, getWidth() - 20, 30);
+    speedSlider.setBounds(10, 170, getWidth() - 20, 30);// adding speed slider 
+    speedLabel.setBounds(10, 210, getWidth() - 20, 30);
 }
 juce::String PlayerGUI::formatTime(double timeInSeconds)
 {
@@ -216,6 +229,14 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
             juce::String totalTime = formatTime(total);
             timeLabel.setText(currentTime + " / " + totalTime, juce::dontSendNotification);
         }
+    }
+    else if (slider == &speedSlider)
+    {
+
+        double speed = speedSlider.getValue();
+        playerAudio.setSpeed(speedSlider.getValue());
+        speedLabel.setText("Speed: " + juce::String(speed, 1) + "x", juce::dontSendNotification);
+
     }
 }
 

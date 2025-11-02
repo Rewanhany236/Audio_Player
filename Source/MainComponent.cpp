@@ -33,5 +33,5 @@ void MainComponent::releaseResources()
 
 void MainComponent::resized()
 {
-    player1.setBounds(20, 20, getWidth() - 40, 120);
+    player1.setBounds(20, 20, getWidth() - 40, 300);
 }
