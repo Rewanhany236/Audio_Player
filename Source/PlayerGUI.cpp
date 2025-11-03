@@ -165,23 +165,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         playerAudio.mute((float)volumeSlider.getValue());
 
     }
-    if (button == &back10Button)
-    {
-        double currentPosition = playerAudio.getPosition();
-        double newPosition = currentPosition - 10.0;
-        if (newPosition < 0.0)
-            newPosition = 0.0;
-        playerAudio.setPosition(newPosition);
-    }
-    if (button == &forward10Button)
-    {
-        double currentPosition = playerAudio.getPosition();
-        double length = playerAudio.getLength();
-        double newPosition = currentPosition + 10.0;
-        if (newPosition > length)
-            newPosition = length;
-        playerAudio.setPosition(newPosition);
-    }
+  
     if (button == &back10Button)
     {
         playerAudio.back10s();
