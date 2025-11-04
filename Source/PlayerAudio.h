@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-class PlayerAudio
+class PlayerAudio : public juce::AudioSource
 {
 public:
 	PlayerAudio();
@@ -30,7 +30,7 @@ public:
 	void back10s();
 	void setSpeed(double newSpeed);
 
-	    //Setters and Getters for looping segement
+	//Setters and Getters for looping segement
 	void setABLoopPoints(double startA, double endB);
 	void getABLoopPoints(double& startA, double& endB) const;
 	void setABLooping(bool shouldLoop);
@@ -53,6 +53,8 @@ public:
 	void previousTrack();
 	void nextTrack();
 
+	void enableReverb(bool Enable);
+	bool boolenableReverb() const { return isReverbOn; }
 
 private:
 	juce::AudioFormatManager formatManager;
@@ -68,9 +70,16 @@ private:
 	double loopA = -1.0;
 	double loopB = -1.0;
 
-	// Playlist 
+	// Playlist
 	juce::Array<juce::File> playlist;
 	int currentTrackIndex = -1;
+
+	// Reverb
+	juce::Reverb reverb;
+	juce::Reverb::Parameters reverbParam;
+	bool isReverbOn = false;
+
+
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)

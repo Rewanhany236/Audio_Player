@@ -22,9 +22,17 @@ void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 }
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
+
     if (resampler != nullptr) {
         resampler->getNextAudioBlock(bufferToFill);
     }
+    if (isReverbOn)
+    {
+        auto* left = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
+        auto* right = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
+        reverb.processStereo(left, right, bufferToFill.numSamples);
+    }
+
 }
 void PlayerAudio::releaseResources()
 {
@@ -63,7 +71,7 @@ void PlayerAudio::disableLooping()
 {
     looping = false;
     if (readerSource)
-        readerSource->setLooping(false); 
+        readerSource->setLooping(false);
 }
 void PlayerAudio::play()
 {
@@ -190,6 +198,8 @@ void PlayerAudio::playNextInPlaylist()
         return;
     currentTrackIndex = (currentTrackIndex + 1) % playlist.size();
     loadFile(playlist[currentTrackIndex]);
+    enableReverb(false);
+
     play();
 }
 void PlayerAudio::playPreviousInPlaylist()
@@ -198,6 +208,8 @@ void PlayerAudio::playPreviousInPlaylist()
         return;
     currentTrackIndex = (currentTrackIndex - 1 + playlist.size()) % playlist.size();
     loadFile(playlist[currentTrackIndex]);
+    enableReverb(false);
+
     play();
 }
 void PlayerAudio::previousTrack()
@@ -225,5 +237,23 @@ void PlayerAudio::getABLoopPoints(double& startA, double& endB) const
 void PlayerAudio::setABLooping(bool shouldLoop)
 {
     looping = shouldLoop;
-    
+
+}
+void PlayerAudio::enableReverb(bool Enable)
+{
+
+    isReverbOn = Enable;
+
+    if (Enable)
+    {
+
+        reverbParam.roomSize = 0.5f;
+        reverbParam.damping = 0.5f;
+        reverbParam.wetLevel = 0.4f;
+        reverbParam.dryLevel = 0.6f;
+        reverbParam.width = 1.0f;
+        reverbParam.freezeMode = 0.0f;
+        reverb.setParameters(reverbParam);
+    }
+
 }

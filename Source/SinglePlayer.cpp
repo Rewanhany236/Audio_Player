@@ -7,7 +7,7 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     :playerAudio(audioSource)
 {
     // Add buttons
-    for (auto* btn : { &loadplaylistButton, &restartButton , &stopButton , &playPause , &goToStart, &goToEnd , &muteButton, &back10Button, &forward10Button ,&nextButton ,&prevButton, &loopModeToggle })
+    for (auto* btn : { &loadplaylistButton, &restartButton , &stopButton , &playPause , &goToStart, &goToEnd , &muteButton, &back10Button, &forward10Button ,&nextButton ,&prevButton, &loopModeToggle , &reverbButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -24,7 +24,7 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     positionSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     addAndMakeVisible(positionSlider);
 
-    // Speed Slider 
+    // Speed Slider
     speedSlider.setRange(0.5, 2.0, 0.1);
     speedSlider.setValue(1.0);
     speedSlider.addListener(this);
@@ -53,7 +53,7 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     setBButton.setVisible(false);
 
 
-    // Update slider 
+    // Update slider
     startTimerHz(30);
 
     // Metadata labels
@@ -90,13 +90,13 @@ void SinglePlayer::releaseResources()
 
 void SinglePlayer::resized()
 {
-    
+
     const int panelWidth = getWidth();
-    const int buttonHeight = 25;  
-    const int smallButtonHeight = 20; 
+    const int buttonHeight = 25;
+    const int smallButtonHeight = 20;
     const int padding = 5;
     const int columnWidth = (panelWidth - (3 * padding)) / 2;
-    const int thirdColumnWidth = (panelWidth - (4 * padding)) / 3;
+    const int fourthColumnWidth = (panelWidth - (5 * padding)) / 4;
 
     int y = padding;
     int x = padding;
@@ -121,11 +121,13 @@ void SinglePlayer::resized()
     x = padding;
     y += buttonHeight + padding;
 
-    goToStart.setBounds(x, y, thirdColumnWidth, buttonHeight);
-    x += thirdColumnWidth + padding;
-    goToEnd.setBounds(x, y, thirdColumnWidth, buttonHeight);
-    x += thirdColumnWidth + padding;
-    muteButton.setBounds(x, y, thirdColumnWidth, buttonHeight);
+    goToStart.setBounds(x, y, fourthColumnWidth, buttonHeight);
+    x += fourthColumnWidth + padding;
+    goToEnd.setBounds(x, y, fourthColumnWidth, buttonHeight);
+    x += fourthColumnWidth + padding;
+    muteButton.setBounds(x, y, fourthColumnWidth, buttonHeight);
+    x += fourthColumnWidth + padding;
+    reverbButton.setBounds(x, y, fourthColumnWidth, buttonHeight);
 
     x = padding;
     y += buttonHeight + padding;
@@ -167,18 +169,20 @@ void SinglePlayer::resized()
     metadataY += labelHeight;
 
     durationLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
-    metadataY += labelHeight + padding; 
+    metadataY += labelHeight + padding;
 
     int playlistStartY = metadataY;
 
     int remainingHeight = getHeight() - playlistStartY - (buttonHeight + padding * 2);
-    if (remainingHeight < 100) remainingHeight = 100; 
+    if (remainingHeight < 100) remainingHeight = 100;
 
     playlistBox.setBounds(padding, playlistStartY, panelWidth - (2 * padding), remainingHeight);
 
     y = playlistStartY + remainingHeight + padding;
     prevButton.setBounds(padding, y, columnWidth, buttonHeight);
     nextButton.setBounds(columnWidth + (2 * padding), y, columnWidth, buttonHeight);
+
+
 }
 juce::String SinglePlayer::formatTime(double timeInSeconds)
 {
@@ -354,6 +358,15 @@ void SinglePlayer::buttonClicked(juce::Button* button)
     {
         playerAudio.previousTrack();
     }
+	if (button == &reverbButton)
+        {
+		isReverb= !playerAudio.boolenableReverb();
+        playerAudio.enableReverb(isReverb);
+        if (isReverb)
+            reverbButton.setButtonText("Reverb ON");
+        else
+            reverbButton.setButtonText("Reverb OFF");
+	}
 
 }
 
@@ -375,8 +388,8 @@ void SinglePlayer::timerCallback()
 
     //A-B Looping
     double loopA, loopB;
-    playerAudio.getABLoopPoints(loopA, loopB); 
-    bool isLoopingActive = playerAudio.getLoopingStatus(); 
+    playerAudio.getABLoopPoints(loopA, loopB);
+    bool isLoopingActive = playerAudio.getLoopingStatus();
 
     if (isLoopingActive && loopA != -1.0 && loopB != -1.0 && loopA < loopB)
     {
@@ -384,7 +397,7 @@ void SinglePlayer::timerCallback()
         if (current >= loopB)
         {
             playerAudio.setPosition(loopA);
-            current = loopA; 
+            current = loopA;
         }
     }
 }
@@ -460,6 +473,6 @@ void SinglePlayer::selectedRowsChanged(int lastRowSelected)
         artistLabel.setText("Artist: " + playerAudio.getArtist(), juce::dontSendNotification);
         durationLabel.setText("Duration: " + formatTime(total), juce::dontSendNotification);
         albumLabel.setText("Album: " + playerAudio.getAlbum(), juce::dontSendNotification);
-       
+
     }
 }

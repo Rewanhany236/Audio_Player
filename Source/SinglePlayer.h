@@ -12,7 +12,7 @@ class SinglePlayer : public juce::Component,
 
 {
 public:
-    
+
     ~SinglePlayer() override;
     SinglePlayer(PlayerAudio& audioSource);
 
@@ -31,14 +31,14 @@ public:
 private:
     PlayerAudio& playerAudio;
 
-    //GUI elements 
+    //GUI elements
     juce::TextButton loadplaylistButton{ "Load Playlist" };
     juce::TextButton restartButton{ "Restart" };
     juce::TextButton stopButton{ "Stop" };
     juce::TextButton playPause{ "Pause/Play" };
     juce::TextButton goToStart{ "Go to Start" };
     juce::TextButton goToEnd{ "End" };
-    juce::TextButton muteButton{ "mute" };    
+    juce::TextButton muteButton{ "mute" };
     juce::TextButton back10Button{ "-10.0s" };
     juce::TextButton forward10Button{ "+10.0s" };
     juce::Slider volumeSlider;
@@ -54,7 +54,7 @@ private:
     juce::Label albumLabel;
 
     juce::TextButton loopModeToggle{ "A-B Loop" }; //Seg
-    juce::TextButton setAButton{ "Set A" };    
+    juce::TextButton setAButton{ "Set A" };
     juce::TextButton setBButton{ "Set B" };
 
     bool isDragging = false;
@@ -73,11 +73,15 @@ private:
     void sliderDragStarted(juce::Slider* slider) override;
     void sliderDragEnded(juce::Slider* slider) override;
 
-    // Playlist 
+    // Playlist
     juce::ListBox playlistBox;
     juce::StringArray playlistNames;
     juce::TextButton nextButton{ "Next" };
     juce::TextButton prevButton{ "Prev" };
+
+	// Reverb button
+    juce::TextButton reverbButton{ "Reverb" };
+    bool isReverb = false;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SinglePlayer)

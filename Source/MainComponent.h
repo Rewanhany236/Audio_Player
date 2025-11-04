@@ -3,7 +3,7 @@
 #include "SinglePlayer.h"  
 
 class MainComponent : public juce::AudioAppComponent,
-    
+
     private juce::Timer
 {
 public:
@@ -13,7 +13,7 @@ public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
-    void resized() override; 
+    void resized() override;
     void paint(juce::Graphics& g) override;
     void timerCallback() override;
 

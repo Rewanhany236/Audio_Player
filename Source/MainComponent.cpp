@@ -6,14 +6,14 @@ MainComponent::MainComponent()
     : player1(player1Audio),
     player2(player2Audio)
 {
-    internalMixer.addInputSource(player1Audio.getOutputAudioSource(), false);
-    internalMixer.addInputSource(player2Audio.getOutputAudioSource(), false);
+    internalMixer.addInputSource(&player1Audio, false);
+    internalMixer.addInputSource(&player2Audio, false);
 
     addAndMakeVisible(player1);
     addAndMakeVisible(player2);
 
     setAudioChannels(0, 2);
-    setSize(800, 600);
+    setSize(1000, 800);
 
 }
 
