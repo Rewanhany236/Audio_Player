@@ -28,6 +28,8 @@ public:
 	void mute(float currentVolume);
 	void forward10s();
 	void back10s();
+    void savesession();
+    void loadsession();
 	void setSpeed(double newSpeed);
 
 	//Setters and Getters for looping segement
@@ -57,6 +59,7 @@ public:
 	bool boolenableReverb() const { return isReverbOn; }
 
 private:
+    juce::File currentAudioFile;
 	juce::AudioFormatManager formatManager;
 	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	std::unique_ptr<juce::ResamplingAudioSource > resampler;
