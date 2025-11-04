@@ -11,6 +11,7 @@ MainComponent::MainComponent()
 
     addAndMakeVisible(player1);
     addAndMakeVisible(player2);
+    player1.getAudio().loadsession();
 
     setAudioChannels(0, 2);
     setSize(1000, 800);
@@ -19,6 +20,7 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    player1.getAudio().savesession();
     shutdownAudio();
 }
 
