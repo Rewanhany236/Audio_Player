@@ -21,7 +21,7 @@ public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
     void releaseResources();
-
+    PlayerAudio& getAudio();
     int getNumRows() override;
     void paintListBoxItem(int rowNumber, juce::Graphics& g,
         int width, int height, bool rowIsSelected) override;
