@@ -181,6 +181,47 @@ void PlayerAudio::forward10s()
 
     transportSource.setPosition(newposition);
 }
+void PlayerAudio::savesession()
+{
+    if (!currentAudioFile.existsAsFile())
+        return;
+
+    juce::PropertiesFile::Options options;
+    options.applicationName = "SimpleAudioPlayer";
+    options.filenameSuffix = ".settings";
+    options.osxLibrarySubFolder = "Application Support";
+    options.folderName = "SimpleAudioPlayer";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+
+    juce::PropertiesFile props(options);
+    props.setValue("lastFile", currentAudioFile.getFullPathName());
+    props.setValue("lastPosition", getPosition());
+    props.save();
+}
+
+void PlayerAudio::loadsession()
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = "SimpleAudioPlayer";
+    options.filenameSuffix = ".settings";
+    options.folderName = "SimpleAudioPlayer";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+    juce::PropertiesFile props(options);
+    juce::String lastFile = props.getValue("lastFile");
+    double lastPosition = props.getDoubleValue("lastPosition");
+    if (lastFile.isNotEmpty())
+    {
+        juce::File file(lastFile);
+        if (file.existsAsFile())
+        {
+            if (loadFile(file))
+            {
+                currentAudioFile = file;
+                setPosition(lastPosition);
+            }
+        }
+    }
+}
 void PlayerAudio::setSpeed(double newSpeed) {
 
     if (resampler != nullptr) {
