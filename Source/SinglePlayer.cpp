@@ -86,8 +86,9 @@ void SinglePlayer::releaseResources()
 {
     playerAudio.releaseResources();
 }
-
-
+PlayerAudio& SinglePlayer::getAudio() {
+    return playerAudio;
+}
 void SinglePlayer::resized()
 {
 
