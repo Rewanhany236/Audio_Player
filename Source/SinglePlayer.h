@@ -26,9 +26,6 @@ public:
     void paintListBoxItem(int rowNumber, juce::Graphics& g,
         int width, int height, bool rowIsSelected) override;
     void selectedRowsChanged(int lastRowSelected) override;
-    //yaaaaaaaaaaaaaaaaaaaaaaaaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    void listBoxItemClicked(int row, const juce::MouseEvent&) override;
-    void updateMarkerDisplay();
 
 
 private:
@@ -81,23 +78,10 @@ private:
     juce::StringArray playlistNames;
     juce::TextButton nextButton{ "Next" };
     juce::TextButton prevButton{ "Prev" };
-    //yaaaaaaaaaaaaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    struct Marker
-    {
-        juce::String name;
-        double timePosition;
-        int id;
-    };
-    juce::Array<Marker> markers;
-    int markerCounter = 0;
-    juce::ListBox markerListBox;
-    juce::StringArray markerDisplayNames;
 
     // Reverb button
     juce::TextButton reverbButton{ "Reverb" };
     bool isReverb = false;
-    //yaaaaaaaaaaaaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    juce::TextButton addMarkerButton{ "Add marker" };
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SinglePlayer)
