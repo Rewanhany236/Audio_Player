@@ -7,7 +7,7 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     :playerAudio(audioSource)
 {
     // Add buttons
-    for (auto* btn : { &loadplaylistButton, &restartButton , &stopButton , &playPause , &goToStart, &goToEnd , &muteButton, &back10Button, &forward10Button ,&nextButton ,&prevButton, &loopModeToggle , &reverbButton, &addMarkerButton })
+    for (auto* btn : { &loadplaylistButton, &restartButton , &stopButton , &playPause , &goToStart, &goToEnd , &muteButton, &back10Button, &forward10Button ,&nextButton ,&prevButton, &loopModeToggle , &reverbButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -67,9 +67,9 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     // Playlist Box
     addAndMakeVisible(playlistBox);
     playlistBox.setModel(this);
-    //yarrrrrrrrrrrrraaaaaaaaaaaaaaaaaa
-    addAndMakeVisible(markerListBox);
-    markerListBox.setModel(this);
+
+
+
 
 }
 SinglePlayer::~SinglePlayer() {}
@@ -134,10 +134,7 @@ void SinglePlayer::resized()
     y += buttonHeight + padding;
 
     loopModeToggle.setBounds(x, y, panelWidth - (2 * padding), buttonHeight);
-    //yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    y += buttonHeight + padding;
-    addMarkerButton.setBounds(padding, y, panelWidth - (2 * padding), buttonHeight);
-    //yaaaaaaaaaaaaaaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
     y += buttonHeight + padding;
     setAButton.setBounds(padding, y, columnWidth, smallButtonHeight);
     setBButton.setBounds(columnWidth + (2 * padding), y, columnWidth, smallButtonHeight);
@@ -176,16 +173,6 @@ void SinglePlayer::resized()
     metadataY += labelHeight + padding;
 
     int playlistStartY = metadataY;
-    //yaaaaaaaaaaaaaaaaaaaaaaraaaaaaaaaaaaaaaaaaaaaaaa
-    durationLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
-    metadataY += labelHeight + padding;
-
-    // Marker list
-    int markerListHeight = 80;
-    markerListBox.setBounds(padding, metadataY, panelWidth - (2 * padding), markerListHeight);
-    metadataY += markerListHeight + padding;
-
-    //end
 
     int remainingHeight = getHeight() - playlistStartY - (buttonHeight + padding * 2);
     if (remainingHeight < 100) remainingHeight = 100;
@@ -223,7 +210,7 @@ void SinglePlayer::buttonClicked(juce::Button* button)
         fileChooser = std::make_unique<juce::FileChooser>(
             "Select an audio file...",
             juce::File{},
-            ".wav;.mp3");
+            "*.wav;*.mp3");
 
         fileChooser->launchAsync(
             juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectMultipleItems,
@@ -381,17 +368,6 @@ void SinglePlayer::buttonClicked(juce::Button* button)
         else
             reverbButton.setButtonText("Reverb OFF");
     }
-    if (button == &addMarkerButton)
-    {
-        double currentPos = playerAudio.getPosition();
-        markerCounter++;
-        Marker newMarker;
-        newMarker.name = "Marker" + juce::String(markerCounter);
-        newMarker.timePosition = currentPos;
-        newMarker.id = markerCounter;
-        markers.add(newMarker);
-        updateMarkerDisplay();
-    }
 
 }
 
@@ -470,13 +446,11 @@ void SinglePlayer::sliderDragEnded(juce::Slider* slider)
         playerAudio.setPosition(positionSlider.getValue());
     }
 }
-//yaaaaaaaaaaaaraaaaaaaaaaaaaaaa
 int SinglePlayer::getNumRows()
 {
-    if (juce::Component::getCurrentlyFocusedComponent() == &markerListBox)
-        return markers.size();
     return playlistNames.size();
-} //end
+}
+
 void SinglePlayer::paintListBoxItem(int rowNumber, juce::Graphics& g,
     int width, int height, bool rowIsSelected)
 {
@@ -484,19 +458,8 @@ void SinglePlayer::paintListBoxItem(int rowNumber, juce::Graphics& g,
         g.fillAll(juce::Colours::lightblue);
 
     g.setColour(juce::Colours::white);
-
-    // Check yara
-    auto* focusedComponent = juce::Component::getCurrentlyFocusedComponent();
-    if (focusedComponent == &markerListBox && rowNumber < markers.size())
-    {
-        g.drawText(markerDisplayNames[rowNumber], 0, 0, width, height,
-            juce::Justification::centredLeft);
-    }
-    else if (rowNumber < playlistNames.size())
-    {
-        g.drawText(playlistNames[rowNumber], 0, 0, width, height,
-            juce::Justification::centredLeft);
-    }
+    g.drawText(playlistNames[rowNumber], 0, 0, width, height,
+        juce::Justification::centredLeft);
 }
 void SinglePlayer::selectedRowsChanged(int lastRowSelected)
 {
@@ -514,28 +477,4 @@ void SinglePlayer::selectedRowsChanged(int lastRowSelected)
 
     }
 }
-//yaraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-void SinglePlayer::updateMarkerDisplay()
-{
-    markerDisplayNames.clear();
 
-    for (const auto& marker : markers)
-    {
-        markerDisplayNames.add(marker.name + " (" + formatTime(marker.timePosition) + ")");
-    }
-
-    markerListBox.updateContent();
-    markerListBox.selectRow(markerDisplayNames.size() - 1);
-    markerListBox.repaint();
-    markerListBox.scrollToEnsureRowIsOnscreen(markerDisplayNames.size() - 1);
-}
-void SinglePlayer::listBoxItemClicked(int row, const juce::MouseEvent&)
-{
-    if (juce::Component::getCurrentlyFocusedComponent() == &markerListBox)
-    {
-        if (row >= 0 && row < markers.size())
-        {
-            playerAudio.setPosition(markers[row].timePosition);
-        }
-    }
-}//end
