@@ -1,0 +1,21 @@
+102f621 last version
+8a60b39 SinglePlayer.h
+a63f050 SinglePlayer.cpp
+587343c PlayerAudio.h
+78a8147 PlayerAudio.cpp
+8289ded SinglePlayer.h
+40a3835 SinglePlayer.cpp
+e105b44 PlayerAudio.h
+3704912 PlayerAudio.cpp
+a0919b7 SinglePlayer.cpp
+fb8bd3d SinglePlayer.h
+c8ecb22 PlayerAudio.h
+1d882ff PlayerAudio.cpp
+53cfdc9 MainComponent.cpp
+fce539f add reverb btn
+b6017ef Added main.cpp file
+9efcb12 Added multiple players wiith mixer
+a298151 Added new feature
+9afd508 حفظ التعديلات قبل عمل pull
+aa40e2e Added restart feature
+2936d14 Add Source folder only
