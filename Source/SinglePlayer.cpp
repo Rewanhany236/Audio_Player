@@ -51,6 +51,13 @@ SinglePlayer::SinglePlayer(PlayerAudio& audioSource)
     setBButton.addListener(this);
     addAndMakeVisible(setBButton);
     setBButton.setVisible(false);
+    //yara
+    addAndMakeVisible(addMarkerButton);
+    addMarkerButton.addListener(this);
+
+    addAndMakeVisible(markerListBox);
+    markerModel = std::make_unique<MarkerListModel>(this);
+    markerListBox.setModel(markerModel.get());
 
 
     // Update slider
@@ -89,9 +96,35 @@ void SinglePlayer::releaseResources()
 PlayerAudio& SinglePlayer::getAudio() {
     return playerAudio;
 }
+
+juce::String SinglePlayer::formatTime(double timeInSeconds)
+{
+    int totalSeconds = static_cast<int>(timeInSeconds);
+    int hours = totalSeconds / 3600;
+    int minutes = (totalSeconds % 3600) / 60;
+    int seconds = totalSeconds % 60;
+
+    if (hours > 0)
+        return juce::String::formatted("%02d:%02d:%02d", hours, minutes, seconds);
+    else
+        return juce::String::formatted("%02d:%02d", minutes, seconds);
+}
+void SinglePlayer::updateMarkerList()
+{
+    markerDisplayNames.clear();
+    auto& markers = playerAudio.getMarkers();
+
+    for (int i = 0; i < markers.size(); ++i)
+    {
+        juce::String displayText = markers[i].name + " - (" + formatTime(markers[i].position) + ")";
+        markerDisplayNames.add(displayText);
+    }
+
+    markerListBox.updateContent();
+    markerListBox.repaint();
+}
 void SinglePlayer::resized()
 {
-
     const int panelWidth = getWidth();
     const int buttonHeight = 25;
     const int smallButtonHeight = 20;
@@ -101,6 +134,7 @@ void SinglePlayer::resized()
 
     int y = padding;
     int x = padding;
+
     loadplaylistButton.setBounds(x, y, columnWidth, buttonHeight);
     x += columnWidth + padding;
     restartButton.setBounds(x, y, columnWidth, buttonHeight);
@@ -133,10 +167,19 @@ void SinglePlayer::resized()
     x = padding;
     y += buttonHeight + padding;
 
+    // Loop button
     loopModeToggle.setBounds(x, y, panelWidth - (2 * padding), buttonHeight);
 
+    x = padding;
     y += buttonHeight + padding;
-    setAButton.setBounds(padding, y, columnWidth, smallButtonHeight);
+
+    // Add Marker button 
+    addMarkerButton.setBounds(x, y, panelWidth - (2 * padding), buttonHeight);
+
+    x = padding;
+    y += buttonHeight + padding;
+
+    setAButton.setBounds(x, y, columnWidth, smallButtonHeight);
     setBButton.setBounds(columnWidth + (2 * padding), y, columnWidth, smallButtonHeight);
 
     y += smallButtonHeight + padding;
@@ -146,15 +189,12 @@ void SinglePlayer::resized()
     positionSlider.setBounds(padding, y, panelWidth - (2 * padding), 15);
 
     y += 15 + padding;
-
     timeLabel.setBounds(padding, y, panelWidth - (2 * padding), smallButtonHeight);
 
     y += smallButtonHeight + padding;
-
     speedSlider.setBounds(padding, y, panelWidth - (2 * padding), smallButtonHeight);
 
     y += smallButtonHeight + padding;
-
     speedLabel.setBounds(padding, y, panelWidth - (2 * padding), smallButtonHeight);
 
     int metadataY = y + smallButtonHeight + padding;
@@ -162,42 +202,28 @@ void SinglePlayer::resized()
 
     titleLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
     metadataY += labelHeight;
-
     artistLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
     metadataY += labelHeight;
-
     albumLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
     metadataY += labelHeight;
-
     durationLabel.setBounds(padding, metadataY, panelWidth - (2 * padding), labelHeight);
     metadataY += labelHeight + padding;
 
     int playlistStartY = metadataY;
-
     int remainingHeight = getHeight() - playlistStartY - (buttonHeight + padding * 2);
     if (remainingHeight < 100) remainingHeight = 100;
 
-    playlistBox.setBounds(padding, playlistStartY, panelWidth - (2 * padding), remainingHeight);
+    int halfWidth = (panelWidth - (3 * padding)) / 2;
+    int listHeight = remainingHeight;
 
-    y = playlistStartY + remainingHeight + padding;
+    // Playlist left - Marker list right
+    playlistBox.setBounds(padding, playlistStartY, halfWidth, listHeight);
+    markerListBox.setBounds(halfWidth + (2 * padding), playlistStartY, halfWidth, listHeight);
+
+    y = playlistStartY + listHeight + padding;
     prevButton.setBounds(padding, y, columnWidth, buttonHeight);
     nextButton.setBounds(columnWidth + (2 * padding), y, columnWidth, buttonHeight);
-
-
 }
-juce::String SinglePlayer::formatTime(double timeInSeconds)
-{
-    int totalSeconds = static_cast<int>(timeInSeconds);
-    int hours = totalSeconds / 3600;
-    int minutes = (totalSeconds % 3600) / 60;
-    int seconds = totalSeconds % 60;
-
-    if (hours > 0)
-        return juce::String::formatted("%02d:%02d:%02d", hours, minutes, seconds);
-    else
-        return juce::String::formatted("%02d:%02d", minutes, seconds);
-}
-
 
 void SinglePlayer::buttonClicked(juce::Button* button)
 {
@@ -270,7 +296,11 @@ void SinglePlayer::buttonClicked(juce::Button* button)
             setBButton.setButtonText("Set B");
         }
     }
-
+    if (button == &addMarkerButton)
+    {
+        playerAudio.addMarker();
+        updateMarkerList();
+    }
     if (button == &setAButton && isABLoopMode)
     {
         loopStartA = playerAudio.getPosition();
@@ -448,6 +478,7 @@ void SinglePlayer::sliderDragEnded(juce::Slider* slider)
 }
 int SinglePlayer::getNumRows()
 {
+    
     return playlistNames.size();
 }
 
@@ -456,25 +487,49 @@ void SinglePlayer::paintListBoxItem(int rowNumber, juce::Graphics& g,
 {
     if (rowIsSelected)
         g.fillAll(juce::Colours::lightblue);
+    else
+        g.fillAll(juce::Colours::darkgrey);
 
     g.setColour(juce::Colours::white);
-    g.drawText(playlistNames[rowNumber], 0, 0, width, height,
-        juce::Justification::centredLeft);
-}
-void SinglePlayer::selectedRowsChanged(int lastRowSelected)
-{
-    if (lastRowSelected >= 0 && lastRowSelected < playerAudio.getPlaylist().size())
+
+    if (rowNumber < playlistNames.size())
     {
-        juce::File selectedFile = playerAudio.getPlaylist()[lastRowSelected];
-        playerAudio.loadFile(selectedFile);
-        double total = playerAudio.getLength();
-
-        // metadata labels
-        titleLabel.setText("Title: " + playerAudio.getTitle(), juce::dontSendNotification);
-        artistLabel.setText("Artist: " + playerAudio.getArtist(), juce::dontSendNotification);
-        durationLabel.setText("Duration: " + formatTime(total), juce::dontSendNotification);
-        albumLabel.setText("Album: " + playerAudio.getAlbum(), juce::dontSendNotification);
-
+        g.drawText(playlistNames[rowNumber], 2, 0, width - 4, height,
+            juce::Justification::centredLeft, true);
     }
 }
 
+void SinglePlayer::selectedRowsChanged(int lastRowSelected)
+{
+    if (lastRowSelected < 0)
+        return;
+
+    if (lastRowSelected < playerAudio.getPlaylist().size())
+    {
+        juce::File selectedFile = playerAudio.getPlaylist()[lastRowSelected];
+        playerAudio.loadFile(selectedFile);
+    }
+}
+// ==== Marker List Painting ====
+
+int SinglePlayer::getNumRowsForMarkers()
+{
+    return markerDisplayNames.size();
+}
+
+void SinglePlayer::paintMarkerListBoxItem(int rowNumber, juce::Graphics& g,
+    int width, int height, bool rowIsSelected)
+{
+    if (rowIsSelected)
+        g.fillAll(juce::Colours::orange);
+    else
+        g.fillAll(juce::Colours::darkgrey);
+
+    g.setColour(juce::Colours::white);
+
+    if (rowNumber < markerDisplayNames.size())
+    {
+        g.drawText(markerDisplayNames[rowNumber], 2, 0, width - 4, height,
+            juce::Justification::centredLeft, true);
+    }
+}

@@ -298,3 +298,31 @@ void PlayerAudio::enableReverb(bool Enable)
     }
 
 }
+void PlayerAudio::addMarker()
+{
+    double currentPos = getPosition();
+    Marker newMarker;
+    newMarker.id = ++markerCounter;
+    newMarker.position = currentPos;
+    newMarker.name = "Marker" + juce::String(markerCounter);
+    markers.add(newMarker);
+}
+
+const juce::Array<Marker>& PlayerAudio::getMarkers() const
+{
+    return markers;
+}
+
+void PlayerAudio::jumpToMarker(int markerIndex)
+{
+    if (markerIndex >= 0 && markerIndex < markers.size())
+    {
+        setPosition(markers[markerIndex].position);
+    }
+}
+
+void PlayerAudio::clearMarkers()
+{
+    markers.clear();
+    markerCounter = 0;
+}

@@ -29,6 +29,40 @@ public:
 
 
 private:
+    class MarkerListModel : public juce::ListBoxModel
+    {
+    public:
+        SinglePlayer* owner;
+        MarkerListModel(SinglePlayer* o) : owner(o) {}
+
+        int getNumRows() override
+        {
+            return owner->markerDisplayNames.size();
+        }
+
+        void paintListBoxItem(int rowNumber, juce::Graphics& g,
+            int width, int height, bool rowIsSelected) override
+        {
+            g.fillAll(rowIsSelected ? juce::Colours::orange : juce::Colours::darkgrey);
+            g.setColour(juce::Colours::white);
+            if (rowNumber < owner->markerDisplayNames.size())
+            {
+                g.drawText(owner->markerDisplayNames[rowNumber], 2, 0, width - 4, height,
+                    juce::Justification::centredLeft, true);
+            }
+        }
+
+        void selectedRowsChanged(int lastRowSelected) override
+        {
+            if (lastRowSelected >= 0 && lastRowSelected < owner->playerAudio.getMarkers().size())
+            {
+                owner->playerAudio.jumpToMarker(lastRowSelected);
+            }
+        }
+    };
+    std::unique_ptr<MarkerListModel> markerModel;
+
+
     PlayerAudio& playerAudio;
 
     //GUI elements
@@ -82,6 +116,15 @@ private:
     // Reverb button
     juce::TextButton reverbButton{ "Reverb" };
     bool isReverb = false;
+
+    juce::TextButton addMarkerButton{ "Add Marker" };
+    juce::ListBox markerListBox;
+    juce::StringArray markerDisplayNames;
+    void updateMarkerList();
+    // Marker List Display
+    int getNumRowsForMarkers();
+    void paintMarkerListBoxItem(int rowNumber, juce::Graphics& g,
+        int width, int height, bool rowIsSelected);
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SinglePlayer)

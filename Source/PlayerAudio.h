@@ -1,8 +1,20 @@
 #pragma once
 #include <JuceHeader.h>
+
+struct Marker
+{
+	int id;
+	double position;
+	juce::String name;
+};
 class PlayerAudio : public juce::AudioSource
 {
 public:
+	void addMarker();
+	const juce::Array<Marker>& getMarkers() const;
+	void jumpToMarker(int markerIndex);
+	void clearMarkers();
+
 	PlayerAudio();
 	~PlayerAudio();
 
@@ -59,6 +71,10 @@ public:
 	bool boolenableReverb() const { return isReverbOn; }
 
 private:
+	juce::Array<Marker> markers;
+	int markerCounter = 0;
+
+
 	juce::File currentAudioFile;
 	juce::AudioFormatManager formatManager;
 	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
